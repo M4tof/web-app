@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Web App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Header / Banner -->
+<header class="banner">
+    <h1>Item Manager</h1>
+    <p>A simple test bench for raw HTML, CSS, and Java</p>
+</header>
+
+<!-- Main Card Container -->
+<main class="container">
+    <section class="card">
+        <h2>Add an Entry</h2>
+
+        <!-- Standard form layout -->
+        <form id="data-form">
+            <div class="form-group">
+                <label for="nameInput">Name</label>
+                <input type="text" id="nameInput" name="name" placeholder="e.g. Test item" required>
+            </div>
+
+            <div class="form-group">
+                <label for="descInput">Description</label>
+                <input type="text" id="descInput" name="description" placeholder="e.g. Some description text">
+            </div>
+
+            <button type="submit" id="submitBtn">Send to Server</button>
+        </form>
+    </section>
+
+    <!-- Response / Output Section -->
+    <section class="card">
+        <h2>Server Output</h2>
+        <div id="output" class="output-box">
+            Waiting for server response...
+        </div>
+    </section>
+</main>
+
+<script>
+    const form = document.getElementById('data-form');
+    const output = document.getElementById('output');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Don't refresh the page
+
+        const payload = {
+            name: document.getElementById('nameInput').value,
+            description: document.getElementById('descInput').value
+        };
+
+        output.textContent = "Sending request to server...";
+
+        try {
+            // Send JSON to our Spring Boot endpoint
+            const res = await fetch('/api/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const responseText = await res.text();
+            output.textContent = responseText;
+        } catch (err) {
+            output.textContent = "Error communicating with server: " + err;
+        }
+    });
+</script>
+</body>
+</html>
