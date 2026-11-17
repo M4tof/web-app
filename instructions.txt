@@ -1,0 +1,17 @@
+To run:
+    sudo docker compose up -d
+
+To manually check on db:
+    sudo docker exec -it local-postgres psql -U postgres -d appdb
+    \dt
+    \d
+
+    \q
+
+Dockerfile builds our app into an image
+    sudo docker compose up --build -d
+    sudo docker logs -f web-app
+
+    sudo docker ps
+    sudo docker stop <X>
+    sudo docker compose up db -d
