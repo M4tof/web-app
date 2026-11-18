@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS specifically for the password toggle and honeypot */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 4.5rem;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 0.5rem;
+            width: auto;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.75rem;
+            background-color: var(--border, #334155);
+            color: var(--text-color, #f8fafc);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--muted-color, #94a3b8);
+            color: #0f172a;
+        }
+
+        .hp-field {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
+            z-index: -1;
+        }
+    </style>
+
+</head>
+<body>
+
+<!-- Header / Banner -->
+<header class="banner">
+    <h1>User Registration</h1>
+    <p>Please tell us who you are:</p>
+</header>
+
+<!-- Main Card Container -->
+<main class="container">
+    <section class="card">
+        <form id="register-form">
+
+            <!-- Honeypot field (Bots fill this, humans will never see it) -->
+            <div class="hp-field" aria-hidden="true">
+                <label for="nickname">Nickname</label>
+                <input type="text" id="nickname" name="nickname" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="emailInput">Email</label>
+                <input type="email" id="emailInput" name="email" placeholder="name.lastname@address.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordInput">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="passwordInput" name="password" placeholder="Choose a password" required>
+                    <button type="button" class="toggle-btn" data-target="passwordInput">Show</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="repeatPassword">Repeat Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="repeatPassword" name="repeatPassword" placeholder="Confirm your password" required>
+                    <button type="button" class="toggle-btn" data-target="repeatPassword">Show</button>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">Create Account</button>
+        </form>
+    </section>
+
+    <!-- Response / Output Section -->
+    <section class="card">
+        <h2>Server Output</h2>
+        <div id="output" class="output-box">
+            Waiting for registration...
+        </div>
+    </section>
+</main>
+
+<script>
+    const form = document.getElementById('register-form');
+    const output = document.getElementById('output');
+    const toggleBtns = document.querySelectorAll('.toggle-btn');
+
+    // 1. Password Visibility Toggle logic
+    toggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetInput = document.getElementById(btn.dataset.target);
+            const isPassword = targetInput.getAttribute('type') === 'password';
+
+            targetInput.setAttribute('type', isPassword ? 'text' : 'password');
+            btn.textContent = isPassword ? 'Hide' : 'Show';
+        });
+    });
+
+    // 2. Form Submission logic
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const password = document.getElementById('passwordInput').value;
+        const repeatPassword = document.getElementById('repeatPassword').value;
+
+        // Simple client-side validation
+        if (password !== repeatPassword) {
+            output.textContent = "Error: Passwords do not match!";
+            output.style.borderColor = "#f87171";
+            return;
+        }
+
+        const payload = {
+            email: document.getElementById('emailInput').value,
+            password: password,
+            nickname: document.getElementById('nickname').value // Honeypot: must be empty on the server!
+        };
+
+        output.textContent = "Registering user...";
+        output.style.borderColor = "var(--border)";
+
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const responseText = await res.text();
+            output.textContent = responseText;
+        } catch (err) {
+            output.textContent = "Error communicating with server: " + err;
+        }
+    });
+</script>
+<!--TODO-->
+<!--REGEX ON EMAIL-->
+<!--min 12 chars, max 64 chars, upper/lower/numbers/special-->
+<!--captcha on create account button-->
+</body>
+</html>

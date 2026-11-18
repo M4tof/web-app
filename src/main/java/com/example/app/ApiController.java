@@ -5,24 +5,33 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ApiController {
 
-    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
-    public ApiController(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
+    public ApiController(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public record ItemRequest(String name, String description) {}
+    // Matches the JSON payload sent by the frontend
+    public record RegisterRequest(String email, String password, String nickname) {}
 
-    @PostMapping("/api/submit")
-    public String handleSubmission(@RequestBody ItemRequest request) {
-        // 1. Create and save the entity into the DB
-        Item item = new Item(request.name(), request.description());
-        Item savedItem = itemRepository.save(item);
+    @PostMapping("/api/register")
+    public String handleRegistration(@RequestBody RegisterRequest request) {
+//        TODO!!!!
 
-        // 2. Log confirmation to terminal
-        System.out.println("LOG: Saved to DB with ID #" + savedItem.getId() + " -> " + savedItem.getName());
+        // 1. Honeypot check: If the hidden nickname field has text, a bot filled it
+        if (request.nickname() != null && !request.nickname().isBlank()) {
+            System.out.println("ALERT: Honeypot triggered! Rejected bot submission.");
+            return "Registration error.";
+        }
 
-        // 3. Return message to the frontend
-        return "Saved item to database! (Assigned ID: " + savedItem.getId() + ")";
+        // 2. Create the user entity (storing plain text for now, hashing comes later)
+        User newUser = new User(request.email(), request.password());
+
+        // 3. Save into the database
+        User savedUser = userRepository.save(newUser);
+
+        System.out.println("LOG: Successfully registered user #" + savedUser.getId() + " (" + savedUser.getEmail() + ")");
+
+        return "User registered successfully! Assigned DB ID: " + savedUser.getId();
     }
 }
