@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="register.css">
+    <script src="register.js" defer></script>
+</head>
+<body>
+
+<header class="banner">
+    <h1>User Registration</h1>
+    <p>Create your new account</p>
+</header>
+
+<main class="container">
+    <section class="card">
+        <form id="register-form" novalidate>
+
+            <!-- Honeypot (bot trap) -->
+            <div class="hp-field" aria-hidden="true">
+                <label for="nickname">Nickname</label>
+                <input type="text" id="nickname" name="nickname" tabindex="-1" autocomplete="off">
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="emailInput">Email</label>
+                <input
+                        type="email"
+                        id="emailInput"
+                        name="email"
+                        placeholder="name.lastname@address.com"
+                        required
+                >
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="passwordInput">Password</label>
+                <div class="password-wrapper">
+                    <input
+                            type="password"
+                            id="passwordInput"
+                            name="password"
+                            placeholder="Choose a strong password"
+                            required
+                    >
+                    <button type="button" class="toggle-btn" data-target="passwordInput">Show</button>
+                </div>
+
+                <!-- Dynamic Requirements Checklist -->
+                <ul class="criteria-list">
+                    <li id="rule-len">At least 8 characters (max 64)</li>
+                    <li id="rule-upper">At least one uppercase letter (A-Z)</li>
+                    <li id="rule-lower">At least one lowercase letter (a-z)</li>
+                    <li id="rule-num">At least one number (0-9)</li>
+                    <li id="rule-special">At least one special character (!@#$%^&*...)</li>
+                </ul>
+            </div>
+
+            <!-- Repeat Password -->
+            <div class="form-group">
+                <label for="repeatPassword">Repeat Password</label>
+                <div class="password-wrapper">
+                    <input
+                            type="password"
+                            id="repeatPassword"
+                            name="repeatPassword"
+                            placeholder="Confirm your password"
+                            required
+                    >
+                    <button type="button" class="toggle-btn" data-target="repeatPassword">Show</button>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">Create Account</button>
+        </form>
+    </section>
+
+    <!-- Server Output Area -->
+    <section class="card">
+        <h2>Status</h2>
+        <div id="output" class="output-box">
+            Ready for registration.
+        </div>
+    </section>
+</main>
+
+<!-- Captcha Modal Popup -->
+<div id="captcha-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+        <h3>Human Verification</h3>
+        <p>Please enter the character displayed below to continue:</p>
+
+        <!-- The Captcha Display Box (hardcoded '4' for now) -->
+        <!--        TODO DO NOT DO 4, what are we HIDNUS!?!?!-->
+
+        <div id="captcha-display" class="captcha-badge">4</div>
+
+        <div class="form-group">
+            <input type="text" id="captcha-input" placeholder="Enter code" autocomplete="off">
+            <span id="captcha-error" class="error-msg"></span>
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" id="captcha-cancel-btn" class="btn-secondary">Cancel</button>
+            <button type="button" id="captcha-confirm-btn" class="btn-primary">Verify & Submit</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
