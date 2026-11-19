@@ -234,19 +234,41 @@ button[type="submit"]:hover {
     margin-bottom: 1.25rem;
 }
 
-/* Captcha Badge */
-.captcha-badge {
+.captcha-img-container {
+    position: relative;
     display: inline-block;
-    padding: 0.6rem 2rem;
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: 0.25rem;
-    background-color: #0f172a;
-    border: 1px dashed var(--primary);
-    border-radius: 6px;
-    color: var(--primary);
     margin-bottom: 1rem;
-    user-select: none; /* Prevent text highlighting */
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.captcha-img-container img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    user-select: none;
+}
+
+#captcha-reload-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(15, 23, 42, 0.7);
+    color: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#captcha-reload-btn:hover {
+    background: var(--card-bg);
 }
 
 .error-msg {

@@ -8,13 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Captcha elements
     const captchaModal = document.getElementById('captcha-modal');
-    const captchaDisplay = document.getElementById('captcha-display');
+    const captchaPrompt = document.getElementById('captcha-prompt');
+    const captchaImg = document.getElementById('captcha-img');
     const captchaInput = document.getElementById('captcha-input');
     const captchaError = document.getElementById('captcha-error');
     const captchaCancelBtn = document.getElementById('captcha-cancel-btn');
     const captchaConfirmBtn = document.getElementById('captcha-confirm-btn');
+    const captchaReloadBtn = document.getElementById('captcha-reload-btn');
 
-    // DOM references for checklist items
+    let currentCaptchaId = null;
+
+    // Rules Checklist
     const rules = {
         len: document.getElementById('rule-len'),
         upper: document.getElementById('rule-upper'),
@@ -25,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // 1. Password Visibility Toggle
+    // Toggle Password Visibility
     toggleBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const target = document.getElementById(btn.dataset.target);
@@ -35,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. Real-Time Password Validation
+    // Real-Time Password Validation
     function validatePassword(val) {
         const checks = {
             len: val.length >= 8 && val.length <= 64,
@@ -52,46 +56,54 @@ document.addEventListener('DOMContentLoaded', () => {
         return Object.values(checks).every(Boolean);
     }
 
-    pwdInput.addEventListener('input', () => {
-        validatePassword(pwdInput.value);
-    });
+    pwdInput.addEventListener('input', () => validatePassword(pwdInput.value));
 
-    // 3. Form Submit -> Opens Captcha Modal
+    // Form Submit -> Opens Captcha
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const email = emailInput.value.trim();
-        const password = pwdInput.value;
-        const repeatPassword = repeatInput.value;
-
-        output.style.borderColor = 'var(--border)';
-        output.style.color = 'var(--muted-color)';
-
-        if (!emailRegex.test(email)) {
-            showError("Invalid email address. It must include a domain (e.g. name@domain.com).");
+        if (!emailRegex.test(emailInput.value.trim())) {
+            showError("Invalid email address.");
             return;
         }
 
-        if (!validatePassword(password)) {
+        if (!validatePassword(pwdInput.value)) {
             showError("Password does not meet all security requirements.");
             return;
         }
 
-        if (password !== repeatPassword) {
+        if (pwdInput.value !== repeatInput.value) {
             showError("Passwords do not match.");
             return;
         }
 
-        // All checks passed -> Show the Captcha popup!
         openCaptcha();
     });
 
-    // --- Captcha Modal Logic ---
-    function openCaptcha() {
+    // Fetch Captcha from Server
+    async function loadNewCaptcha() {
         captchaInput.value = '';
         captchaError.textContent = '';
+        captchaPrompt.textContent = 'Loading challenge...';
+        captchaImg.style.opacity = '0.3';
+
+        try {
+            const res = await fetch('/api/captcha');
+            const data = await res.json();
+
+            currentCaptchaId = data.captchaId;
+            captchaPrompt.textContent = data.prompt;
+            captchaImg.src = data.imageBase64;
+            captchaImg.style.opacity = '1';
+            captchaInput.focus();
+        } catch (err) {
+            captchaError.textContent = 'Failed to load captcha from server.';
+        }
+    }
+
+    function openCaptcha() {
         captchaModal.classList.remove('hidden');
-        captchaInput.focus();
+        loadNewCaptcha();
     }
 
     function closeCaptcha() {
@@ -99,24 +111,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     captchaCancelBtn.addEventListener('click', closeCaptcha);
+    captchaReloadBtn.addEventListener('click', loadNewCaptcha);
 
     captchaConfirmBtn.addEventListener('click', () => {
-        const enteredVal = captchaInput.value.trim();
-        const expectedVal = captchaDisplay.textContent.trim(); // "4"
-
-        if (enteredVal !== expectedVal) {
-            captchaError.textContent = "Incorrect code, please try again.";
-            captchaInput.value = '';
-            captchaInput.focus();
+        const answer = captchaInput.value.trim();
+        if (!answer) {
+            captchaError.textContent = 'Please enter a count.';
             return;
         }
 
-        // Correct! Close modal and send payload
         closeCaptcha();
-        submitRegistration();
+        submitRegistration(answer);
     });
 
-    // Allow pressing "Enter" inside captcha input
     captchaInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -124,15 +131,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. Send Payload to Server
-    async function submitRegistration() {
+    // Send Payload
+    async function submitRegistration(captchaAnswer) {
         const payload = {
             email: emailInput.value.trim(),
             password: pwdInput.value,
-            nickname: document.getElementById('nickname').value
+            nickname: document.getElementById('nickname').value,
+            captchaId: currentCaptchaId,
+            captchaAnswer: captchaAnswer
         };
 
-        output.textContent = "Sending registration to server...";
+        output.textContent = 'Submitting registration...';
+        output.style.borderColor = 'var(--border)';
+        output.style.color = 'var(--muted-color)';
 
         try {
             const res = await fetch('/api/register', {
@@ -148,17 +159,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 output.style.color = 'var(--success)';
                 output.textContent = responseText;
                 form.reset();
-                validatePassword("");
+                validatePassword('');
             } else {
-                showError(responseText || "Server rejected registration.");
+                showError(responseText || 'Registration failed.');
             }
         } catch (err) {
-            showError("Network error communicating with server: " + err);
+            showError('Network error: ' + err);
         }
     }
 
     function showError(message) {
-        output.textContent = "Error: " + message;
+        output.textContent = 'Error: ' + message;
         output.style.borderColor = 'var(--error)';
         output.style.color = 'var(--error)';
     }

@@ -33,9 +33,10 @@ public class User {
     // Default constructor required by JPA
     public User() {}
 
-    public User(String email, String passwordHash) {
+    public User(String email, String passwordHash, String activationTokenHash) {
         this.email = email;
         this.passwordHash = passwordHash;
+        this.activationTokenHash = activationTokenHash;
     }
 
     // Getters & Setters

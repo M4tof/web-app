@@ -11,10 +11,6 @@
   </component>
   <component name="DBNavigator.Project.DatabaseAssistantManager">
     <assistants>
-      <assistant-state connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" assistant-type="SELECT_AI" default-profile-name="" selected-chat-id="" availability="UNAVAILABLE" acknowledgement="NONE">
-        <tools />
-        <mcp-servers />
-      </assistant-state>
       <assistant-state connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" assistant-type="PUBLIC" default-profile-name="" selected-chat-id="57074C8656604940B70B1921781DE793" availability="AVAILABLE" acknowledgement="ENGAGED" selected="true">
         <chats>
           <chat id="57074C8656604940B70B1921781DE793" title="" session-signature="" timestamp="1795021706794">
@@ -22,6 +18,10 @@
             <context mode="DEVELOPMENT" provider="" profile="" model="" action="" interactive="true" />
           </chat>
         </chats>
+        <tools />
+        <mcp-servers />
+      </assistant-state>
+      <assistant-state connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" assistant-type="SELECT_AI" default-profile-name="" selected-chat-id="" availability="UNAVAILABLE" acknowledgement="NONE">
         <tools />
         <mcp-servers />
       </assistant-state>
@@ -46,7 +46,9 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/users" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabasePrerequisiteManager">
     <prerequisites />
@@ -63,6 +65,9 @@
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
+  </component>
+  <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$APPLICATION_CONFIG_DIR$/consoles/db/3daeeaeb-37ae-4de6-8841-636be3581d6e/console.sql" connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" session-id="MAIN" current-schema="appdb" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
