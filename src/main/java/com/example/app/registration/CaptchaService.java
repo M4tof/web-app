@@ -1,4 +1,4 @@
-package com.example.app;
+package com.example.app.registration;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;

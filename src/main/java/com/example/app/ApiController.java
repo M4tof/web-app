@@ -1,5 +1,10 @@
 package com.example.app;
 
+import com.example.app.registration.CaptchaService;
+import com.example.app.registration.EmailVerificationService;
+import com.example.app.registration.RateLimitingService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,13 +14,19 @@ public class ApiController {
     private final UserRepository userRepository;
     private final CaptchaService captchaService;
     private final PasswordService passwordService;
+    private final EmailVerificationService emailVerificationService;
+    private final RateLimitingService rateLimitingService; // 1. Inject
 
     public ApiController(UserRepository userRepository,
                          CaptchaService captchaService,
-                         PasswordService passwordService) {
+                         PasswordService passwordService,
+                         EmailVerificationService emailVerificationService,
+                         RateLimitingService rateLimitingService) {
         this.userRepository = userRepository;
         this.captchaService = captchaService;
         this.passwordService = passwordService;
+        this.emailVerificationService = emailVerificationService;
+        this.rateLimitingService = rateLimitingService;
     }
 
     @GetMapping("/api/captcha")
@@ -33,7 +44,20 @@ public class ApiController {
     ) {}
 
     @PostMapping("/api/register")
-    public ResponseEntity<String> handleRegistration(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> handleRegistration(
+            @RequestBody RegisterRequest request,
+            HttpServletRequest httpRequest) {
+
+        // 0. RATE LIMITING CHECK (FIRST LINE OF DEFENSE)
+        String clientIp = RateLimitingService.getClientIp(httpRequest);
+        long blockedSeconds = rateLimitingService.checkRateLimit(clientIp);
+
+        if (blockedSeconds > 0) {
+            return ResponseEntity
+                    .status(HttpStatus.TOO_MANY_REQUESTS) // HTTP 429
+                    .header("Retry-After", String.valueOf(blockedSeconds))
+                    .body("Too many registration attempts. Please wait " + blockedSeconds + " seconds before trying again.");
+        }
 
         // Honeypot check
         if (request.nickname() != null && !request.nickname().isBlank()) {
@@ -47,6 +71,11 @@ public class ApiController {
         if (!isCaptchaValid) {
             return ResponseEntity.badRequest().body("Captcha verification failed. Please try again.");
         }
+
+        // DNS MX Deliverability Check
+//        if (!emailVerificationService.hasValidMxRecord(request.email())) {
+//            return ResponseEntity.badRequest().body("Invalid email: Domain does not exist or cannot receive emails.");
+//        }
 
         // ARGON2ID HASHING WITH PEPPER
         String hashedPassword = passwordService.hashPassword(request.password());
