@@ -49,6 +49,8 @@ public class ApiController {
             String captchaAnswer
     ) {}
 
+    public record ResendRequest(String email) {}
+
     @PostMapping("/api/register")
     public ResponseEntity<String> handleRegistration(
             @RequestBody RegisterRequest request,
@@ -102,7 +104,7 @@ public class ApiController {
             System.out.println("-------------------------------------------------------------");
             System.out.println("DELIVERY CONFIRMED: Activation link sent to " + savedUser.getEmail());
             // Updated link to /activate:
-            System.out.println("Link: https://localhost:8443/activate?token=" + rawToken + "&email=" + savedUser.getEmail());
+            System.out.println("Link: https://localhost:8443/activate/activate.html?token=" + rawToken + "&email=" + savedUser.getEmail());
             System.out.println("-------------------------------------------------------------");
 
             return ResponseEntity.ok("Registration successful! Check your email to activate your account.");
@@ -114,9 +116,7 @@ public class ApiController {
         }
     }
 
-    // ==============================================================
-    // NOW MAPPED DIRECTLY TO /activate
-    // ==============================================================
+    // MAPPED DIRECTLY TO /activate
     @GetMapping("/activate")
     public ResponseEntity<String> handleActivation(
             @RequestParam("token") String token,
@@ -164,5 +164,46 @@ public class ApiController {
         System.out.println("ACTIVATION SUCCESS: User #" + user.getId() + " activated.");
 
         return ResponseEntity.ok("Account successfully activated! Proceed to Login.");
+    }
+
+    @PostMapping("/activate/resend")
+    public ResponseEntity<String> handleResendActivation(
+            @RequestBody ResendRequest request,
+            HttpServletRequest httpRequest) {
+
+        String clientIp = RateLimitingService.getClientIp(httpRequest);
+        String userAgent = httpRequest.getHeader("User-Agent");
+
+        if (request.email() == null || request.email().isBlank()) {
+            return ResponseEntity.badRequest().body("Email parameter is missing.");
+        }
+
+        String email = request.email().trim().toLowerCase();
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            // Only resend if the user is not activated yet
+            if (!user.isActivated()) {
+                String rawToken = passwordService.generateSecureToken();
+                String hashedToken = passwordService.hashToken(rawToken);
+
+                user.setActivationTokenHash(hashedToken);
+                user.setActivationExpiresAt(java.time.Instant.now().plus(24, java.time.temporal.ChronoUnit.HOURS));
+                userRepository.save(user);
+
+                userLogService.logEvent(user.getId(), "ACTIVATION_TOKEN_RESENT", clientIp, userAgent);
+
+                System.out.println("-------------------------------------------------------------");
+                System.out.println("NEW ACTIVATION LINK GENERATED (RESEND):");
+                System.out.println("Email: " + user.getEmail());
+                System.out.println("Link:  https://localhost:8443/activate/activate.html?token=" + rawToken + "&email=" + user.getEmail());
+                System.out.println("-------------------------------------------------------------");
+            }
+        }
+
+        // Return a generic success response (Anti-Enumeration)
+        return ResponseEntity.ok("A new activation link has been sent to your email!");
     }
 }

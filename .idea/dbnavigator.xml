@@ -45,7 +45,6 @@
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files>
-      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/user_logs" />
       <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/users" />
     </open-files>
   </component>

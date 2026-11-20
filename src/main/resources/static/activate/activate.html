@@ -5,20 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Activation</title>
     <link rel="stylesheet" href="/register/register.css">
+    <style>
+        .status-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .icon-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .icon-circle svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(56, 189, 248, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1.25rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .state-success {
+            background-color: rgba(74, 222, 128, 0.15);
+            color: var(--success, #4ade80);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .state-warning {
+            background-color: rgba(251, 146, 60, 0.15);
+            color: #fb923c;
+            border: 1px solid rgba(251, 146, 60, 0.3);
+        }
+
+        .state-error {
+            background-color: rgba(248, 113, 113, 0.15);
+            color: var(--error, #f87171);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-action {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.75rem;
+            background-color: var(--primary);
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-action:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
     <script src="activate.js" defer></script>
 </head>
 <body style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
 
-<main class="card" style="text-align: center; max-width: 440px; width: 90%;">
-    <h2 id="status-title" style="color: var(--primary);">Verifying Account...</h2>
-    <p id="status-msg" style="color: var(--muted-color); margin: 1.25rem 0;">
-        Please wait while we validate your activation token.
-    </p>
+<main class="card" style="max-width: 460px; width: 90%;">
+    <div class="status-container">
+        <!-- Icon / Spinner placeholder -->
+        <div id="icon-slot">
+            <div class="spinner"></div>
+        </div>
 
-    <!-- Dynamic Action Button -->
-    <a id="action-btn" href="/index.html" style="display: none; padding: 0.65rem 1.25rem; background: var(--primary); color: #0f172a; border-radius: 6px; text-decoration: none; font-weight: 600;">
-        Go to Home
-    </a>
+        <h2 id="status-title" style="color: var(--primary); font-size: 1.5rem; margin-bottom: 0.5rem;">
+            Verifying Account...
+        </h2>
+
+        <p id="status-msg" style="color: var(--muted-color); font-size: 0.95rem; line-height: 1.5;">
+            Validating your activation token. Please hold on...
+        </p>
+
+        <!-- Dynamic Action Button -->
+        <div id="action-slot"></div>
+    </div>
 </main>
 
 </body>
