@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation</title>
+    <link rel="stylesheet" href="/register/register.css">
+    <script src="activate.js" defer></script>
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<main class="card" style="text-align: center; max-width: 440px; width: 90%;">
+    <h2 id="status-title" style="color: var(--primary);">Verifying Account...</h2>
+    <p id="status-msg" style="color: var(--muted-color); margin: 1.25rem 0;">
+        Please wait while we validate your activation token.
+    </p>
+
+    <!-- Dynamic Action Button -->
+    <a id="action-btn" href="/index.html" style="display: none; padding: 0.65rem 1.25rem; background: var(--primary); color: #0f172a; border-radius: 6px; text-decoration: none; font-weight: 600;">
+        Go to Home
+    </a>
+</main>
+
+</body>
+</html>

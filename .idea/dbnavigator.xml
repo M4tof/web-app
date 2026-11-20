@@ -11,10 +11,6 @@
   </component>
   <component name="DBNavigator.Project.DatabaseAssistantManager">
     <assistants>
-      <assistant-state connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" assistant-type="SELECT_AI" default-profile-name="" selected-chat-id="" availability="UNAVAILABLE" acknowledgement="NONE">
-        <tools />
-        <mcp-servers />
-      </assistant-state>
       <assistant-state connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" assistant-type="PUBLIC" default-profile-name="" selected-chat-id="57074C8656604940B70B1921781DE793" availability="AVAILABLE" acknowledgement="ENGAGED" selected="true">
         <chats>
           <chat id="57074C8656604940B70B1921781DE793" title="" session-signature="" timestamp="1795021706794">
@@ -22,6 +18,10 @@
             <context mode="DEVELOPMENT" provider="" profile="" model="" action="" interactive="true" />
           </chat>
         </chats>
+        <tools />
+        <mcp-servers />
+      </assistant-state>
+      <assistant-state connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" assistant-type="SELECT_AI" default-profile-name="" selected-chat-id="" availability="UNAVAILABLE" acknowledgement="NONE">
         <tools />
         <mcp-servers />
       </assistant-state>
@@ -37,16 +37,17 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="2860bc6d-6ab4-466e-abe5-fbb008d23581">
-      <console name="Web-App-DB" type="STANDARD" schema="appdb" session="Main" />
-    </connection>
+    <connection id="2860bc6d-6ab4-466e-abe5-fbb008d23581" />
     <connection id="1103be0f-a533-48f4-a8bf-3f3990a73436" />
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/user_logs" />
+      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/users" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabasePrerequisiteManager">
     <prerequisites />
@@ -59,7 +60,9 @@
     <filter-actions connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" dataset="app_auth.users" active-filter-id="b9a29036-521e-4f48-a83e-02839b1379ed">
       <filter id="b9a29036-521e-4f48-a83e-02839b1379ed" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND" />
     </filter-actions>
-    <filter-actions connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" dataset="app_auth.user_logs" active-filter-id="" />
+    <filter-actions connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" dataset="app_auth.user_logs" active-filter-id="1c31e707-7124-4bbc-bf67-4dccde4c8119">
+      <filter id="1c31e707-7124-4bbc-bf67-4dccde4c8119" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND" />
+    </filter-actions>
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -112,7 +115,7 @@
           <session-user value="postgres" />
         </database>
         <properties>
-          <auto-commit value="false" />
+          <auto-commit value="true" />
         </properties>
         <ssh-settings>
           <active value="false" />

@@ -7,7 +7,7 @@ CREATE TABLE app_auth.users (
     password_hash VARCHAR(255) NOT NULL,
     is_activated BOOLEAN NOT NULL DEFAULT false,
     activation_token_hash VARCHAR(255),
-    activation_expires_at TIMESTAMPTZ NOT NULL DEFAULT (now() + INTERVAL '24 hours'),
+    activation_expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '24 hours'),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

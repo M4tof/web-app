@@ -1,7 +1,1 @@
 - Resend activation once per X time, i uwzględnić na diagramie
-
-- not 72 bytes limit but 72chars limit ( 128bytes? utf-8)
-
-- Niw ma potrzeby na 9, insert załatwi
-
-- przy aktywacji tokenu select id ma sens bo szybszy, ale przy rejestracji można po error codach

@@ -51,4 +51,7 @@ public class User {
     public void setActivationTokenHash(String activationTokenHash) { this.activationTokenHash = activationTokenHash; }
     public Instant getActivationExpiresAt() { return activationExpiresAt; }
     public Instant getCreatedAt() { return createdAt; }
+    public void setActivationExpiresAt(Instant activationExpiresAt) {
+        this.activationExpiresAt = activationExpiresAt;
+    }
 }

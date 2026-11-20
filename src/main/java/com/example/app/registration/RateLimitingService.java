@@ -9,13 +9,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class RateLimitingService {
 
-    // Configurable limits
-    private static final int MAX_ATTEMPTS = 5;
-    private static final long TIME_WINDOW_SECONDS = 300; // 5 minutes
+    // 1. Device limit (Specific browser behind the IP)
+    private static final int MAX_DEVICE_ATTEMPTS = 5;
+
+    // 2. Global IP threshold (Emergency flood protection for the whole network)
+    private static final int MAX_GLOBAL_IP_ATTEMPTS = 25;
+
+    private static final long TIME_WINDOW_SECONDS = 300;   // 5 minutes
     private static final long BLOCK_DURATION_SECONDS = 300; // 5 minutes penalty
 
-    // IP -> Attempt Tracker
-    private final Map<String, ClientTracker> ipTrackers = new ConcurrentHashMap<>();
+    private final Map<String, ClientTracker> trackers = new ConcurrentHashMap<>();
 
     private static class ClientTracker {
         int attemptCount = 0;
@@ -24,43 +27,62 @@ public class RateLimitingService {
     }
 
     /**
-     * Checks if the IP is allowed to make a request.
-     * @return 0 if allowed; or the number of seconds remaining in the block penalty.
+     * Checks rate limits for both the composite (IP + User-Agent) and the entire IP.
+     * @return 0 if allowed; or remaining penalty seconds if blocked.
      */
-    public synchronized long checkRateLimit(String ip) {
+    public synchronized long checkRateLimit(String ip, String userAgent) {
         Instant now = Instant.now();
-        ClientTracker tracker = ipTrackers.computeIfAbsent(ip, k -> new ClientTracker());
 
-        // 1. Check if currently blocked
+        // Safe User-Agent fallback + hash to keep memory keys small
+        String uaHash = (userAgent != null) ? Integer.toHexString(userAgent.hashCode()) : "unknown";
+        String deviceKey = ip + "#" + uaHash;
+        String globalIpKey = "GLOBAL#" + ip;
+
+        // Check 1: Is this specific device/browser over the limit?
+        long deviceBlock = checkBucket(deviceKey, MAX_DEVICE_ATTEMPTS, now);
+        if (deviceBlock > 0) {
+            System.out.println("RATE LIMIT (DEVICE): Blocked " + deviceKey + " for " + deviceBlock + "s");
+            return deviceBlock;
+        }
+
+        // Check 2: Is the entire IP hammering the server (bot rotating User-Agents)?
+        long globalBlock = checkBucket(globalIpKey, MAX_GLOBAL_IP_ATTEMPTS, now);
+        if (globalBlock > 0) {
+            System.out.println("RATE LIMIT (GLOBAL IP): Flood detected from IP [" + ip + "]. Blocked for " + globalBlock + "s");
+            return globalBlock;
+        }
+
+        return 0; // Allowed
+    }
+
+    private long checkBucket(String key, int maxAttempts, Instant now) {
+        ClientTracker tracker = trackers.computeIfAbsent(key, k -> new ClientTracker());
+
+        // Check active block
         if (tracker.blockedUntil != null) {
             if (now.isBefore(tracker.blockedUntil)) {
-                // Still blocked -> return remaining seconds
                 return tracker.blockedUntil.getEpochSecond() - now.getEpochSecond();
             } else {
-                // Block expired -> reset tracker
                 tracker.blockedUntil = null;
                 tracker.attemptCount = 0;
                 tracker.windowStart = now;
             }
         }
 
-        // 2. Check if the sliding time window has expired
+        // Reset sliding window
         if (now.isAfter(tracker.windowStart.plusSeconds(TIME_WINDOW_SECONDS))) {
             tracker.attemptCount = 0;
             tracker.windowStart = now;
         }
 
-        // 3. Increment attempts
         tracker.attemptCount++;
 
-        // 4. If limit exceeded, trigger the penalty block
-        if (tracker.attemptCount > MAX_ATTEMPTS) {
+        if (tracker.attemptCount > maxAttempts) {
             tracker.blockedUntil = now.plusSeconds(BLOCK_DURATION_SECONDS);
-            System.out.println("RATE LIMIT TRIGGERED: IP [" + ip + "] is blocked for 5 minutes.");
             return BLOCK_DURATION_SECONDS;
         }
 
-        return 0; // Allowed
+        return 0;
     }
 
     public static String getClientIp(jakarta.servlet.http.HttpServletRequest request) {
@@ -68,7 +90,6 @@ public class RateLimitingService {
         if (xfHeader == null || xfHeader.isBlank() || "unknown".equalsIgnoreCase(xfHeader)) {
             return request.getRemoteAddr();
         }
-        // Take the first IP if there is a comma-separated list of proxies
         return xfHeader.split(",")[0].trim();
     }
 }
