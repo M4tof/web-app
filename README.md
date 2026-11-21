@@ -45,7 +45,7 @@ services:
       - ./tabelki.sql:/docker-entrypoint-initdb.d/01-tabelki.sql:ro
 
   app:
-    image: ghcr.io/M4tof/web-app:latest
+    image: ghcr.io/m4tof/web-app:latest
     container_name: web-app
     restart: always
     ports:
