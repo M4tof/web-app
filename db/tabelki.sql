@@ -21,3 +21,17 @@ CREATE TABLE app_auth.user_logs (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE OR REPLACE FUNCTION app_auth.cleanup_stale_unactivated_users()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM app_auth.users
+    WHERE is_activated = FALSE
+      AND created_at < NOW() - INTERVAL '48 hours';
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_cleanup_stale_users
+AFTER INSERT ON app_auth.users
+FOR EACH STATEMENT
+EXECUTE FUNCTION app_auth.cleanup_stale_unactivated_users();
