@@ -45,8 +45,10 @@
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files>
-      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/user_logs" />
       <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/users" />
+      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/user_sessions" />
+      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/user_recovery_codes" />
+      <object connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" object-ref="schemas/app_auth/tables/user_logs" />
     </open-files>
   </component>
   <component name="DBNavigator.Project.DatabasePrerequisiteManager">
@@ -63,6 +65,12 @@
     <filter-actions connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" dataset="app_auth.user_logs" active-filter-id="1c31e707-7124-4bbc-bf67-4dccde4c8119">
       <filter id="1c31e707-7124-4bbc-bf67-4dccde4c8119" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND" />
     </filter-actions>
+    <filter-actions connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" dataset="app_auth.user_sessions" active-filter-id="764b7c91-af4b-4d81-995f-4d59c626fa6c">
+      <filter id="764b7c91-af4b-4d81-995f-4d59c626fa6c" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND" />
+    </filter-actions>
+    <filter-actions connection-id="2860bc6d-6ab4-466e-abe5-fbb008d23581" dataset="app_auth.user_recovery_codes" active-filter-id="61f7514f-ceee-42a1-8bde-2298f211c200">
+      <filter id="61f7514f-ceee-42a1-8bde-2298f211c200" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND" />
+    </filter-actions>
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -75,6 +83,11 @@
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
     <filters />
+  </component>
+  <component name="DBNavigator.Project.ScriptExecutionManager" clear-outputs="true">
+    <recently-used-interfaces>
+      <mapping database-type="POSTGRES" interface-id="DEFAULT" />
+    </recently-used-interfaces>
   </component>
   <component name="DBNavigator.Project.Settings">
     <states>
@@ -490,7 +503,7 @@
         <show-spec-declaration-navigation-gutter value="true" />
         <enable-spellchecking value="true" />
         <enable-reference-spellchecking value="false" />
-        <show-parser-issue-notifications value="true" />
+        <show-parser-issue-notifications value="false" />
         <show-dialect-suggestion-notifications value="true" />
       </general>
       <confirmations>
