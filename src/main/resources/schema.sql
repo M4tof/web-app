@@ -2,7 +2,7 @@
 -- SCHEMA DEFINITION & SEARCH PATH
 -- ============================================================================
 CREATE SCHEMA IF NOT EXISTS app_auth;;
-DROP SCHEMA IF EXISTS app_auth CASCADE;;
+--DROP SCHEMA IF EXISTS app_auth CASCADE;;
 
 SET
   search_path TO app_auth,
